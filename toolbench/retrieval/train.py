@@ -8,6 +8,7 @@ import torch.nn as nn
 from sentence_transformers import SentenceTransformer, models, InputExample, losses, LoggingHandler
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 from api_evaluator import APIEvaluator
 import argparse
 import os
@@ -77,18 +78,22 @@ documents_df = pd.read_csv(os.path.join(data_path, 'corpus.tsv'), sep='\t')
 ir_corpus, _ = process_retrieval_ducoment(documents_df)
 
 train_queries_df = pd.read_csv(os.path.join(data_path, 'train.query.txt'), sep='\t', names=['qid', 'query'])
-for row in train_queries_df.itertuples():
+logging.info(f"Processing {len(train_queries_df)} train queries")
+for row in tqdm(train_queries_df.itertuples(), total=len(train_queries_df)):
     ir_train_queries[row.qid] = row.query
-train_queries_df = pd.read_csv(os.path.join(data_path, 'test.query.txt'), sep='\t', names=['qid', 'query'])
-for row in train_queries_df.itertuples():
+test_queries_df = pd.read_csv(os.path.join(data_path, 'test.query.txt'), sep='\t', names=['qid', 'query'])
+logging.info(f"Processing {len(test_queries_df)} test queries")
+for row in tqdm(test_queries_df.itertuples(), total=len(test_queries_df)):
     ir_test_queries[row.qid] = row.query
 
 labels_df = pd.read_csv(os.path.join(data_path, 'qrels.train.tsv'), sep='\t', names=['qid', 'useless', 'docid', 'label'])
-for row in labels_df.itertuples():
+logging.info(f"Processing {len(labels_df)} train labels")
+for row in tqdm(labels_df.itertuples(), total=len(labels_df)):
     sample = InputExample(texts=[ir_train_queries[row.qid], ir_corpus[row.docid]], label=row.label)
     train_samples.append(sample)
 labels_df = pd.read_csv(os.path.join(data_path, 'qrels.test.tsv'), sep='\t', names=['qid', 'useless', 'docid', 'label'])
-for row in labels_df.itertuples():
+logging.info(f"Processing {len(labels_df)} test labels")
+for row in tqdm(labels_df.itertuples(), total=len(labels_df)):
     ir_relevant_docs.setdefault(row.qid, set()).add(row.docid)
 
 train_dataloader = DataLoader(train_samples, shuffle=True, batch_size=train_batch_size, pin_memory=True)

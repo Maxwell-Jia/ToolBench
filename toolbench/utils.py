@@ -1,6 +1,8 @@
 import json
+import logging
 import re
 import torch
+from tqdm import tqdm
 import transformers
 import transformers.models.llama.modeling_llama
 from functools import partial
@@ -112,7 +114,8 @@ def replace_llama_with_condense(ratio):
 def process_retrieval_ducoment(documents_df):
     ir_corpus = {}
     corpus2tool = {}
-    for row in documents_df.itertuples():
+    logging.info(f"Processing {len(documents_df)} documents")
+    for row in tqdm(documents_df.itertuples(), total=len(documents_df)):
         doc = json.loads(row.document_content)
         ir_corpus[row.docid] = (doc.get('category_name', '') or '') + ', ' + \
         (doc.get('tool_name', '') or '') + ', ' + \

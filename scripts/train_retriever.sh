@@ -1,6 +1,6 @@
 export PYTHONPATH=./
 export DATA_DIR="data/retrieval/G1/"
-export MODEL_NAME="bert-base-uncased"
+export MODEL_NAME="dbmdz/bert-tiny-historic-multilingual-cased"
 export OUTPUT_PATH="retriever_model"
 
 python toolbench/retrieval/train.py \

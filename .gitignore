@@ -9,3 +9,8 @@ run.bash
 
 *.pyc
 **/__pycache__
+
+.vscode/
+checkpoints/
+log_file.txt
+retriever_model/
